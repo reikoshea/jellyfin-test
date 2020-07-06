@@ -1,0 +1,41 @@
+---
+version: "3.0"
+services:
+  nginx:
+    image: nginx
+    container_name: nginxReverseProxy
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /opt/jellyfin-test/jellyfin-nginx/conf:/etc/nginx:ro
+      - /opt/jellyfin-test/jellyfin-nginx/html:/usr/share/nginx/html:ro
+      - /opt/jellyfin-test/jellyfin-nginx/log:/var/log/nginx:z
+      - /opt/jellyfin-test/jellyfin-nginx/pki:/etc/ssl/nginx:z
+      - /opt/jellyfin-test/jellyfin-nginx/cache:/var/cache/nginx/proxy_temp:z
+    restart: unless-stopped
+  jellyfin:
+    image: linuxserver/jellyfin
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=<timezone>
+#      - UMASK_SET=022 #optional
+    volumes:
+      - /nas/jellyfin_config:/config:z
+      - /nas/jellyfin_cache:/cache:z
+      - /nas/TVShows:/data/tvshows:z
+      - /nas/Movies:/data/movies:z
+#      - /opt/vc/lib:/opt/vc/lib #optional
+    ports:
+      - 8096:8096
+      - 8920:8920 #optional
+#    devices:
+#      - /dev/dri:/dev/dri #optional
+#      - /dev/vcsm:/dev/vcsm #optional
+#      - /dev/vchiq:/dev/vchiq #optional
+#      - /dev/video10:/dev/video10 #optional
+#      - /dev/video11:/dev/video11 #optional
+#      - /dev/video12:/dev/video12 #optional
+    restart: unless-stopped
